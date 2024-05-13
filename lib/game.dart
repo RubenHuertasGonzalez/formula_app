@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:formula_app/main.dart';
 import 'package:image/image.dart' as img;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Game());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Game extends StatelessWidget {
+  const Game({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JUEGO FORMULA 1'),
       ),
       body: const Center(
         child: Column(
@@ -40,13 +40,13 @@ class HomePage extends StatelessWidget {
             // Ajusta el tamaño y el estilo del primer texto
             Text(
               '¡Bienvenido al Juego de Formula 1!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Puedes ajustar el tamaño, el peso de la fuente y el color según tus preferencias
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20), // Agrega un espacio entre los dos textos
             // Ajusta el tamaño y el estilo del segundo texto
             Text(
               'Selecciona un equipo y un piloto para empezar a jugar:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal), // Puedes ajustar el tamaño y el peso de la fuente según tus preferencias
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
             ),
             SizedBox(height: 20), // Agrega un espacio adicional si es necesario
             TeamSelection(), // Mantén el widget existente para la selección de equipos y pilotos
@@ -428,7 +428,7 @@ class _GamePageState extends State<GamePage> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(builder: (context) => const MyApp()),
                   );
                 },
                 child: const Text('Volver al inicio'),

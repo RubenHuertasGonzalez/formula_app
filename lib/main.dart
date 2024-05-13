@@ -195,117 +195,82 @@ class RandomWords extends StatefulWidget {
 
 class _RandomWordsState extends State<RandomWords> {
   String _searchText = '';
-  bool _showPilots = true; // Variable to control whether to show pilots or circuits
+  bool _showPilots = true;
   bool _showPalmares = false;
+  bool _showGame = false;
 
-@override
-Widget build(BuildContext context) {
-  List<dynamic> dataToShow = _showPilots ? _pilots : _circuits;
+  @override
+  Widget build(BuildContext context) {
+    List<dynamic> dataToShow = _showPilots ? _pilots : _circuits;
 
-  if (_showPalmares) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _buildAppBarTitle(), // Aquí se llama a la función para construir el título dinámico
-        actions: [
-          _buildMenu(),
-        ],
-      ),
-      body: _buildPalmares(), // Se llama a la función para construir el cuerpo de palmares
-    );
-  } else {
-    return Scaffold(
-      appBar: AppBar(
-        title: _buildAppBarTitle(), // Aquí se llama a la función para construir el título dinámico
-        actions: [
-          _buildMenu(),
-        ],
-      ),
-      body: _buildBody(), // Se llama a la función para construir el cuerpo según el estado
-    );
-  }
-}
-
-// Función para construir el título de la AppBar dinámicamente
-Widget _buildAppBarTitle() {
-  if (_showPilots) {
-    return const Text('PILOTOS');
-  } else if (_showPalmares) {
-    return const Text('PALMARES');
-  } else {
-    return const Text('CIRCUITOS');
-  }
-}
-
-// Función para construir el cuerpo de la página según el estado
-Widget _buildBody() {
-  List<dynamic> dataToShow = _showPilots ? _pilots : _circuits;
-
-  List<dynamic> filteredData = dataToShow.where((item) {
-    if (item is Pilot) {
-      return item.name.toLowerCase().contains(_searchText) ||
-          item.team.toLowerCase().contains(_searchText);
-    } else if (item is Circuit) {
-      return item.name.toLowerCase().contains(_searchText) ||
-          item.country.toLowerCase().contains(_searchText);
+    if (_showPalmares) {
+      return Scaffold(
+        appBar: AppBar(
+          title: _buildAppBarTitle(),
+          actions: [
+            _buildMenu(),
+          ],
+        ),
+        body: _buildPalmares(),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: _buildAppBarTitle(),
+          actions: [
+            _buildMenu(),
+          ],
+        ),
+        body: _showGame ? Game().build(context) : _buildBody(),
+      );
     }
-    return false;
-  }).toList();
+  }
 
-  return Column(
-    children: [
-      _buildSearchBar(),
-      Expanded(
-        child: ListView.builder(
-          itemCount: filteredData.length,
-          itemBuilder: (context, index) {
-            if (filteredData[index] is Pilot) {
-              return _buildPilotListItem(filteredData[index]);
-            } else if (filteredData[index] is Circuit) {
-              return _buildCircuitListItem(filteredData[index]);
-            }
-            return SizedBox.shrink();
-          },
-        ),
-      ),
-    ],
-  );
-}
+  Widget _buildAppBarTitle() {
+    if (_showPilots) {
+      return const Text('PILOTOS');
+    } else if (_showPalmares) {
+      return const Text('PALMARES');
+    } else if (_showGame) {
+      return const Text('JUEGO');
+    } else {
+      return const Text('CIRCUITOS');
+    }
+  }
 
+  Widget _buildBody() {
+    List<dynamic> dataToShow = _showPilots ? _pilots : _circuits;
 
+    List<dynamic> filteredData = dataToShow.where((item) {
+      if (item is Pilot) {
+        return item.name.toLowerCase().contains(_searchText) ||
+            item.team.toLowerCase().contains(_searchText);
+      } else if (item is Circuit) {
+        return item.name.toLowerCase().contains(_searchText) ||
+            item.country.toLowerCase().contains(_searchText);
+      }
+      return false;
+    }).toList();
 
-  Widget _buildSearchBar() {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
+    return Column(
+      children: [
+        _buildSearchBar(),
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredData.length,
+            itemBuilder: (context, index) {
+              if (filteredData[index] is Pilot) {
+                return _buildPilotListItem(filteredData[index]);
+              } else if (filteredData[index] is Circuit) {
+                return _buildCircuitListItem(filteredData[index]);
+              }
+              return SizedBox.shrink();
+            },
           ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: _showPilots ? 'Buscar por nombre o escudería' : 'Buscar por nombre o país',
-          hintStyle: const TextStyle(color: Colors.grey),
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          border: InputBorder.none,
         ),
-        onChanged: (value) {
-          setState(() {
-            _searchText = value.toLowerCase();
-          });
-        },
-      ),
-    ),
-  );
-}
-
+      ],
+    );
+  }
 
   Widget _buildMenu() {
     return PopupMenuButton(
@@ -316,7 +281,8 @@ Widget _buildBody() {
             onTap: () {
               setState(() {
                 _showPilots = true;
-                _showPalmares = false; 
+                _showPalmares = false;
+                _showGame = false;
               });
               Navigator.of(context).pop();
             },
@@ -328,7 +294,8 @@ Widget _buildBody() {
             onTap: () {
               setState(() {
                 _showPilots = false;
-                _showPalmares = false; 
+                _showPalmares = false;
+                _showGame = false;
               });
               Navigator.of(context).pop();
             },
@@ -340,9 +307,10 @@ Widget _buildBody() {
             onTap: () {
               setState(() {
                 _showPalmares = true;
-                _showPilots = false; 
+                _showPilots = false;
+                _showGame = false;
               });
-              Navigator.of(context).pop(); // Close the menu
+              Navigator.of(context).pop();
             },
           ),
         ),
@@ -350,11 +318,12 @@ Widget _buildBody() {
           child: ListTile(
             title: const Text('JUEGO'),
             onTap: () {
-              Navigator.of(context).pop(); // Close the menu
-              Navigator.push( // Navigate to the game screen
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+              setState(() {
+                _showPalmares = false;
+                _showPilots = false;
+                _showGame = true;
+              });
+              Navigator.of(context).pop(); // Cerrar el menú
             },
           ),
         ),
@@ -362,6 +331,23 @@ Widget _buildBody() {
       child: const Icon(Icons.menu),
     );
   }
+
+  Widget _buildSearchBar() {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextField(
+      onChanged: (text) {
+        setState(() {
+          _searchText = text.toLowerCase();
+        });
+      },
+      decoration: InputDecoration(
+        labelText: 'Buscar',
+        border: OutlineInputBorder(),
+      ),
+    ),
+  );
+}
 
   Widget _buildPilotListItem(Pilot pilot) {
     return ListTile(
@@ -552,7 +538,7 @@ Widget _buildBody() {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    'Trofeos: ${pilot.trophies}',
+                    'Campeonatos: ${pilot.trophies}',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -615,54 +601,71 @@ Widget _buildBody() {
   }
 }
 
-Widget _buildPalmares() {
-  return Expanded(
-    child: AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      child: ListView.builder(
-        itemCount: palmares.length,
-        itemBuilder: (context, index) {
-          final campeonato = palmares[index];
-          return Padding(
-            key: ValueKey<String>('palmares_$index'),
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
+    Widget _buildPalmares() {
+    final List<String> pilotos = palmares.map((campeonato) => campeonato.name).toList();
+    final Map<String, int> contador = {};
+    pilotos.forEach((piloto) => contador[piloto] = (contador[piloto] ?? 0) + 1);
+    final List<MapEntry<String, int>> ranking = contador.entries.toList();
+    ranking.sort((a, b) => b.value.compareTo(a.value));
+
+    return Expanded(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 500),
+        opacity: 1.0,
+        child: ListView.builder(
+          itemCount: palmares.length,
+          itemBuilder: (context, index) {
+            final campeonato = palmares[index];
+            final posicionRanking = ranking.indexWhere((entry) => entry.key == campeonato.name) + 1;
+            final esLider = posicionRanking <= 3;
+            final esOro = posicionRanking == 1;
+            final esPlata = posicionRanking == 2;
+            final esBronce = posicionRanking == 3;
+
+            return Padding(
+              key: ValueKey<String>('palmares_$index'),
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                decoration: BoxDecoration(
+                  color: esOro ? Colors.amber[100] : esPlata ? Colors.grey[300] : esBronce ? Colors.orange[200] : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(10.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
                   ),
-                ],
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(10.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                title: Text(
-                  campeonato.year,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                  leading: esOro ? Icon(Icons.star, color: Colors.amber) : null,
+                  title: Text(
+                    campeonato.year,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  subtitle: Text(
+                    '${campeonato.name} - ${campeonato.team}',
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
-                subtitle: Text(
-                  '${campeonato.name} - ${campeonato.team}',
-                  style: const TextStyle(fontSize: 16),
-                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+
+
 
 
